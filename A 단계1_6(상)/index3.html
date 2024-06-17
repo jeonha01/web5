@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>직업 사진 입력</title>
+    <style>
+        #jobImage {
+            width: 400px;
+            height: auto;
+        }
+
+        #jobsimage {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-around;
+        }
+
+        .randomImage {
+            width: 400px;
+            height: auto;
+            margin: 5px;
+        }
+
+        .imageDescription {
+            text-align: center;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .alright {
+            appearance: none;
+            background-color: #FFFFFF;
+            border-radius: 40em;
+            border-style: none;
+            box-shadow: #ADCFFF 0 -12px 6px inset;
+            box-sizing: border-box;
+            color: #000000;
+            cursor: pointer;
+            display: inline-block;
+            font-family: -apple-system, sans-serif;
+            font-size: 2rem;
+            font-weight: 500;
+            letter-spacing: -.24px;
+            margin: 0;
+            outline: none;
+            padding: 1rem 1.3rem;
+            quotes: auto;
+            text-align: center;
+            text-decoration: none;
+            transition: all .15s;
+            user-select: none;
+            -webkit-user-select: none;
+            touch-action: manipulation;
+        }
+
+        .alright:hover {
+            background-color: #FFC229;
+            box-shadow: #FF6314 0 -6px 8px inset;
+            transform: scale(1.125);
+        }
+
+        .alright:active {
+            transform: scale(1.025);
+        }
+
+        @media (min-width: 768px) {
+            .alright {
+                font-size: 1.5rem;
+                padding: .75rem 2rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <h2>직업사진 기억하기</h2>
+    <h3>
+        다음은 우리가 기억해야할 직업사진입니다.<br>
+        4가지 직업을 확인 해 보세요.
+    </h3>
+
+    <h2>랜덤으로 선택된 4장의 사진:</h2>
+    <div id="jobsimage">
+        <div class="randomjobImageandname">
+            <img class="randomImage">
+            <p class="jobsname jobsname1"></p>
+            <div class="inputjob hidden">
+                <input type="text" class="jobInput jobInput1" placeholder="직업을 입력하세요">
+                <button onclick="submitJob(this, 1)">입력</button>
+            </div>
+        </div>
+        <div class="randomjobImageandname">
+            <img class="randomImage">
+            <p class="jobsname jobsname2"></p>
+            <div class="inputjob hidden">
+                <input type="text" class="jobInput jobInput2" placeholder="직업을 입력하세요">
+                <button onclick="submitJob(this, 2)">입력</button>
+            </div>
+        </div>
+        <div class="randomjobImageandname">
+            <img class="randomImage">
+            <p class="jobsname jobsname3"></p>
+            <div class="inputjob hidden">
+                <input type="text" class="jobInput jobInput3" placeholder="직업을 입력하세요">
+                <button onclick="submitJob(this, 3)">입력</button>
+            </div>
+        </div>
+        <div class="randomjobImageandname">
+            <img class="randomImage">
+            <p class="jobsname jobsname4"></p>
+            <div class="inputjob hidden">
+                <input type="text" class="jobInput jobInput4" placeholder="직업을 입력하세요">
+                <button onclick="submitJob(this, 4)">입력</button>
+            </div>
+        </div>
+    </div>
+
+    <hr>
+
+    <div>
+    <h2>직업사진을 기억해 주세요</h2>
+    <button onclick="startQuiz()" class="alright">시작</button>
+    </div>      
+
+    <script>
+        const images = [
+            { imageUrl: 'https://www.korea.kr/newsWeb/resources/attaches/2024.02/22/01_00.jpg', jobname: '경찰' },
+            { imageUrl: 'https://cdn.huffingtonpost.kr/news/photo/202310/213412_334749_337.jpeg', jobname: '소방관' },
+            { imageUrl: 'https://cdn.edujin.co.kr/news/photo/201905/30896_52036_1339.jpg', jobname: '선생님' },
+            { imageUrl: 'https://img1.daumcdn.net/thumb/R1280x0/?fname=http://t1.daumcdn.net/brunch/service/user/dyXq/image/fK4gKbajhXr2vNQgJ1JCyKLgzug.jpg', jobname: '축구선수' },
+            { imageUrl: 'https://img.khan.co.kr/news/2018/12/27/l_2018122801003102200246132.jpg', jobname: '요리사' },
+            { imageUrl: 'https://www.shutterstock.com/image-photo/singer-holding-microphone-stand-performing-260nw-1039242106.jpg', jobname: '가수' },
+            { imageUrl: 'https://newsimg.hankookilbo.com/2020/03/27/202003271616711585_1.jpg', jobname: '수의사' },
+            { imageUrl: 'https://i.namu.wiki/i/PDQxYeGcplXvCmkPuT0dj__PjA9E7Pert-D8LCXx1VLhLih3QKWCzm5tYAWCmzCuWxORAgbCdPidzODoTJS-RA.webp', jobname: '미용사' },
+            { imageUrl: 'https://image.edaily.co.kr/images/Photo/files/NP/S/2021/09/PS21092300519.jpg', jobname: '판사' },
+            { imageUrl: 'https://image.ajunews.com/content/image/2017/08/11/20170811154217586983.jpg', jobname: '은행원' }
+        ];
+
+        let selectedJobs = [];
+
+        function randomMiximage(images, count) {
+            for (let i = images.length - 1; i > 0; i--) {       // 피셔 예이츠 셔플
+                const j = Math.floor(Math.random() * i);
+                [images[i], images[j]] = [images[j], images[i]]; // 요소 교환
+            }
+            return images.slice(0, count);
+        }
+
+        function randomjobimage() {
+            selectedJobs = randomMiximage(images, 4);
+            const imageContainers = document.querySelectorAll('.randomjobImageandname');
+
+            selectedJobs.forEach((imageData, index) => {
+                const imageDiv = imageContainers[index];
+                const img = imageDiv.querySelector('.randomImage');
+                const jobname = imageDiv.querySelector('.jobsname');
+                img.src = imageData.imageUrl;  // 이미지 URL 설정
+                jobname.textContent = imageData.jobname;  // 직업명 텍스트 설정
+            });
+        }
+
+        randomjobimage();
+
+        function startQuiz() {
+            const jobnames = document.querySelectorAll('.jobsname');        //jobsname 요소를 가져옵니다. 그럼 이게 4개 배열을 가져옴 이미지 이름 
+            jobnames.forEach(jobname => jobname.classList.add('hidden'));   //그럼 여기서 가져온거 순서대로 hidden 요소를 추가해서 안보이게 해준다.
+
+            const inputSections = document.querySelectorAll('.inputjob');   //그리고 인풋세션 가져오기
+            inputSections.forEach(inputSection => inputSection.classList.remove('hidden'));     //히든 지우기 
+        }
+
+        function submitJob(buttonElement, index) {
+            const parents = buttonElement.parentElement;
+            const jobInput = parents.querySelector('.jobInput').value;
+
+            const jobname = parents.parentElement.querySelector('.jobsname').textContent.trim();    //textcontent 인 이유는 div이기 때문이다
+
+            if (!jobInput) {
+                alert("직업을 입력하세요!");
+                return;
+            }
+
+            const isCorrect = jobname === jobInput.trim(); 
+            alert(`입력한 직업은 ${jobInput}입니다. ${isCorrect ? "정답입니다!" : "틀렸습니다."}`);
+
+            if (isCorrect) {
+                const jobnameElement = document.querySelector(`.jobsname${index}`);
+                jobnameElement.classList.remove('hidden');
+            }else {
+                const jobnameElement = document.querySelector(`.jobsname${index}`);
+                jobnameElement.classList.remove('hidden');
+            }
+        }
+    </script>
+</body>
+
+</html>

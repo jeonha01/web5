@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <style>
+    .square {
+      width: 100px;
+      height: 100px;
+      display: inline-block;
+    }
+    .left-square {
+      background-color: white;
+      border: 3px solid black;
+    }
+    .right-square {
+      background-color: white;
+      border: 3px solid black;
+      transform: rotate(90deg);
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(3, 100px);
+      grid-template-rows: repeat(3, 100px);
+    }
+    .arrow-down{
+   width: 0;
+   height: 0;
+   border-top: 50px solid red;/* 화살표 */
+   border-left: 100px solid transparent;
+   border-right: 100px solid transparent;
+    transform: translateX(50px);
+}
+
+  </style>
+</head>
+<body>
+    <h3>다음 위에 그림을 오른쪽 방향으로 90도 회전 시켰을때 </h3>
+    <h3>아래에 있는 도형이 어떤 도형이 되는지 클릭하여 만드시오.</h3>
+  <div class="grid">
+    <div class="left-square" id="left-one"></div>
+    <div class="left-square" id="left-two"></div>
+    <div class="left-square" id="left-three"></div>
+    <div class="left-square" id="left-four"></div>
+    <div class="left-square" id="left-five"></div>
+    <div class="left-square" id="left-six"></div>
+    <div class="left-square" id="left-seven"></div>
+    <div class="left-square" id="left-eight"></div>
+    <div class="left-square" id="left-nine"></div>
+  </div>
+  &nbsp; 
+  <div class="arrow-down"></div>
+  &nbsp; 
+  <div class="grid">
+    <div class="right-square" id="right-one"></div>
+    <div class="right-square" id="right-two"></div>
+    <div class="right-square" id="right-three"></div>
+    <div class="right-square" id="right-four"></div>
+    <div class="right-square" id="right-five"></div>
+    <div class="right-square" id="right-six"></div>
+    <div class="right-square" id="right-seven"></div>
+    <div class="right-square" id="right-eight"></div>
+    <div class="right-square" id="right-nine"></div>
+  </div>
+  <button id="checkButton">Check</button>
+  <div id="result"></div>
+
+  <script>
+    const leftSquares = document.querySelectorAll('.left-square');
+    const rightSquares = document.querySelectorAll('.right-square');
+    const result = document.getElementById('result');
+  
+    function handleSquareClick(square) {
+      const count = parseInt(square.dataset.count) || 0;
+      square.dataset.count = count + 1;
+      if (count == 0) {
+        square.style.backgroundColor = 'red';
+        square.style.border = '3px solid red';
+      } else if (count == 1) {
+        square.style.border = '3px solid red';
+        square.style.backgroundColor = '';
+      } else if (count == 2) {
+        square.dataset.count = 0;
+        square.style.border = '3px solid black';
+      }
+    }
+  
+    function handleSquareRandom(square) {
+      const count = Math.floor(Math.random() * 3);
+      square.dataset.count = count;
+      if (count == 0) {
+        square.style.backgroundColor = 'red';
+        square.style.border = '3px solid red';
+      } else if (count ==  1) {
+        square.style.border = '3px solid red';
+        square.style.backgroundColor = '';
+      } else if (count == 2) {
+        square.dataset.count = 0;
+        square.style.border = '3px solid black';
+      }
+    }
+  
+    function checkGridsMatch() {
+    const leftValues = ["left-one", "left-two", "left-three", "left-four", "left-five", "left-six", "left-seven", "left-eight", "left-nine"];
+    const rightValues = ["right-one", "right-two", "right-three", "right-four", "right-five", "right-six", "right-seven", "right-eight", "right-nine"];
+    let match = true;
+
+    for (let i = 0; i < leftValues.length; i++) {
+        const leftSquare = document.getElementById(leftValues[i]);
+        const rightSquare = document.getElementById(rightValues[i]);
+        const leftCount = parseInt(leftSquare.dataset.count) || 0;
+        const rightCount = parseInt(rightSquare.dataset.count) || 0;
+
+        if (leftCount !== rightCount) {
+            match = true;
+            break;
+        }
+    }
+
+    const resultMessage = match ? "정답입니다!" : "틀렸습니다. 다시 시도해주세요.";
+    alert(resultMessage);
+}
+    const checkButton = document.getElementById('checkButton');
+    checkButton.addEventListener('click', checkGridsMatch);
+  
+    window.onload = function() {
+      leftSquares.forEach((square, index) => {
+        handleSquareRandom(square);
+      });
+    };
+  
+    rightSquares.forEach((square, index) => {
+      square.addEventListener('click', () => {
+        handleSquareClick(square);
+      });
+    });
+  </script>
+</body>
+</html>

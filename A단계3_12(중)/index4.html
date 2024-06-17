@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>직업 그림과 이름 맞추기</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            position: relative;
+        }
+
+        .container {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+        }
+
+        .column {
+            width: 45%;
+        }
+
+        .box {
+            border: 1px solid #ccc;
+            padding: 25px 10px;
+            margin-bottom: 10px;
+            text-align: center;
+            cursor: pointer;
+            position: relative;
+            height: 100px;
+        }
+
+        .box img {
+            width: 100%;
+            max-width: 150px;
+            height: auto;
+        }
+
+        canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: -1;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .matched {
+            background-color: #d4edda;
+        }
+
+        .selected {
+            border-color: #007bff;
+        }
+
+        .letsgo {
+            text-align: center;
+
+
+        }
+
+        .alright {
+
+
+            appearance: none;
+            background-color: #FFFFFF;
+            border-radius: 40em;
+            border-style: none;
+            box-shadow: #ADCFFF 0 -12px 6px inset;
+            box-sizing: border-box;
+            color: #000000;
+            cursor: pointer;
+            display: inline-block;
+            font-family: -apple-system, sans-serif;
+            font-size: 2rem;
+            font-weight: 500;
+            letter-spacing: -.24px;
+            margin: 0;
+            outline: none;
+            padding: 1rem 1.3rem;
+            quotes: auto;
+            text-align: center;
+            text-decoration: none;
+            transition: all .15s;
+            user-select: none;
+            -webkit-user-select: none;
+            touch-action: manipulation;
+        }
+
+        .alright:hover {
+            background-color: #FFC229;
+            box-shadow: #FF6314 0 -6px 8px inset;
+            transform: scale(1.125);
+        }
+
+        .alright:active {
+            transform: scale(1.025);
+        }
+
+        @media (min-width: 768px) {
+            .alright {
+                font-size: 1.5rem;
+                padding: .75rem 2rem;
+            }
+        }
+        
+    </style>
+</head>
+
+<body>
+    <h2>직업 그림과 이름 맞추기</h2>
+    <p>그림과 이름을 연결해보세요.</p>
+    <div class="container">
+        <div id="imagesColumn" class="column">
+            <div class="box" data-index="0"></div>
+            <div class="box" data-index="1"></div>
+            <div class="box" data-index="2"></div>
+            <div class="box" data-index="3"></div>
+        </div>
+        <div id="namesColumn" class="column">
+            <div class="box" data-index="0"></div>
+            <div class="box" data-index="1"></div>
+            <div class="box" data-index="2"></div>
+            <div class="box" data-index="3"></div>
+        </div>
+    </div>
+    <canvas id="connectorCanvas"></canvas>
+    <div class="letsgo"><button onclick="checkMatching()" class="alright">제출</button></div>
+
+    <script>
+        const images = [
+            { imageUrl: 'https://www.korea.kr/newsWeb/resources/attaches/2024.02/22/01_00.jpg', jobname: '경찰' },
+            { imageUrl: 'https://cdn.huffingtonpost.kr/news/photo/202310/213412_334749_337.jpeg', jobname: '소방관' },
+            { imageUrl: 'https://cdn.edujin.co.kr/news/photo/201905/30896_52036_1339.jpg', jobname: '선생님' },
+            { imageUrl: 'https://img1.daumcdn.net/thumb/R1280x0/?fname=http://t1.daumcdn.net/brunch/service/user/dyXq/image/fK4gKbajhXr2vNQgJ1JCyKLgzug.jpg', jobname: '축구선수' },
+            { imageUrl: 'https://img.khan.co.kr/news/2018/12/27/l_2018122801003102200246132.jpg', jobname: '요리사' },
+            { imageUrl: 'https://www.shutterstock.com/image-photo/singer-holding-microphone-stand-performing-260nw-1039242106.jpg', jobname: '가수' },
+            { imageUrl: 'https://newsimg.hankookilbo.com/2020/03/27/202003271616711585_1.jpg', jobname: '수의사' },
+            { imageUrl: 'https://i.namu.wiki/i/PDQxYeGcplXvCmkPuT0dj__PjA9E7Pert-D8LCXx1VLhLih3QKWCzm5tYAWCmzCuWxORAgbCdPidzODoTJS-RA.webp', jobname: '미용사' },
+            { imageUrl: 'https://image.edaily.co.kr/images/Photo/files/NP/S/2021/09/PS21092300519.jpg', jobname: '판사' },
+            { imageUrl: 'https://image.ajunews.com/content/image/2017/08/11/20170811154217586983.jpg', jobname: '은행원' }
+        ];
+
+        let selectedJobs = randomMiximage(images, 4);
+        let selectedNames = [...selectedJobs].sort(() => Math.random() - 0.5); // 섞은 이름 배열
+
+        function randomMiximage(images, count) {
+            for (let i = images.length - 1; i > 0; i--) {       // 피셔 예이츠 셔플
+                const j = Math.floor(Math.random() * (i + 1));
+                [images[i], images[j]] = [images[j], images[i]]; // 요소 교환
+            }
+            return images.slice(0, count);
+        }
+
+        function init() {
+            const imagesColumn = document.getElementById('imagesColumn');
+            const namesColumn = document.getElementById('namesColumn');
+            const canvas = document.getElementById('connectorCanvas');
+            const ctx = canvas.getContext('2d');
+
+            const imageBoxes = imagesColumn.querySelectorAll('.box');
+            const nameBoxes = namesColumn.querySelectorAll('.box');
+
+            selectedJobs.forEach((job, index) => {
+                const imgBox = imageBoxes[index];
+                imgBox.innerHTML = `<img src="${job.imageUrl}" alt="${job.jobname}">`;
+            });
+
+            selectedNames.forEach((job, index) => {
+                const nameBox = nameBoxes[index];
+                nameBox.textContent = job.jobname;
+            });
+
+            let selectedImgBox = null;
+            let selectedNameBox = null;
+
+            document.querySelectorAll('.box').forEach(box => {
+                box.addEventListener('click', () => {
+                    if (box.parentElement.id === 'imagesColumn') {
+                        if (selectedImgBox) selectedImgBox.classList.remove('selected');
+                        selectedImgBox = box;
+                        box.classList.add('selected');
+                    } else if (box.parentElement.id === 'namesColumn') {
+                        if (selectedNameBox) selectedNameBox.classList.remove('selected');
+                        selectedNameBox = box;
+                        box.classList.add('selected');
+                    }
+
+                    if (selectedImgBox && selectedNameBox) {
+                        const imgIndex = selectedImgBox.dataset.index;
+                        const nameIndex = selectedNameBox.dataset.index;
+
+                        ctx.beginPath();
+                        ctx.moveTo(selectedImgBox.getBoundingClientRect().right, selectedImgBox.getBoundingClientRect().top + selectedImgBox.offsetHeight / 2);
+                        ctx.lineTo(selectedNameBox.getBoundingClientRect().left, selectedNameBox.getBoundingClientRect().top + selectedNameBox.offsetHeight / 2);
+                        ctx.strokeStyle = '#000';
+                        ctx.lineWidth = 2;
+                        ctx.stroke();
+
+                        selectedImgBox.classList.remove('selected');
+                        selectedNameBox.classList.remove('selected');
+                        selectedImgBox.classList.add('matched');
+                        selectedNameBox.classList.add('matched');
+
+                        selectedImgBox = null;
+                        selectedNameBox = null;
+                    }
+                });
+            });
+
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+
+        function checkMatching() {
+            let correctMatches = 0;
+            document.querySelectorAll('.box').forEach(box => {
+                if (box.classList.contains('matched')) correctMatches++;
+            });
+            alert(`정답 개수: ${correctMatches / 2}`);
+        }
+
+        window.onload = init;
+        window.onresize = init;
+
+    </script>
+</body>
+
+</html>

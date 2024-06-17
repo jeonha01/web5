@@ -1,0 +1,29 @@
+body{
+    text-align: center;
+    background-color: azure;
+    font-family: '둥글';
+}
+
+.web{
+    position: relative;
+    top:100px
+}
+
+#title{
+    margin-top: 300px;
+}
+
+@font-face {
+    font-family: '둥글';
+    font-style: 'normal';
+    font-weight: 400;
+    src: url('KCC-Ganpan.woff');
+}
+
+.web button{
+    font-size: 40px;
+    background-color: blueviolet;
+    color: white;
+    border-radius: 10px;
+    padding: 50px 50px
+}
